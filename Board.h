@@ -16,12 +16,15 @@ public:
      * is_valid_move: making use of the Piece movement possibility functions (poss_move and poss_capture)
      * Consider the board and whether this piece may actually make such a move --- whether there are obstructions, other
      * pieces and their colours, etc., whether the end position is within board bounds, etc.
-     * @param p
-     * @param start
-     * @param end
-     * @return bool whether a move for Piece p is from
+     * @param p: a pointer to the piece attempting to move
+     * @param start: the current coordinates on the board of p
+     * @param end: the goal coordinates on the board of p
+     * @return bool whether a move for Piece p is valid, taking into account the board state
      */
     bool is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate end);
+    bool is_valid_move_bishop(Piece* p, Piece::coordinate start, Piece::coordinate end);    // used in is_valid_move
+    bool is_valid_move_rook(Piece* p, Piece::coordinate start, Piece::coordinate end);  // used in is_valid_move
+
     static std::string coord_pos_translation(Piece::coordinate coord);
     static Piece::coordinate pos_coord_translation(std::string pos);
     static bool verify_valid_pos(std::string pos);

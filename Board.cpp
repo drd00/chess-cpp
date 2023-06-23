@@ -113,6 +113,114 @@ bool Board::verify_valid_coord(Piece::coordinate coord) {
     return coord.x >= 0 && coord.x <= 7 && coord.y >= 0 && coord.y <= 7;
 }
 
+bool Board::is_valid_move_bishop(Piece*p, Piece::coordinate start, Piece::coordinate end) {
+    if (p->poss_move(start, end)) {
+        // trace the diagonal
+        Piece::coordinate coord = start;
+        if (end.x > start.x && end.y > start.y) {
+            while (coord.x != end.x && coord.y != end.y) {
+                coord.x++;
+                coord.y++;
+
+                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else if (end.x < start.x && end.y < start.y) {
+            while (coord.x != end.x && coord.y != end.y) {
+                coord.x--;
+                coord.y--;
+
+                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else if (end.x > start.x && end.y < start.y) {
+            while (coord.x != end.x && coord.y != end.y) {
+                coord.x++;
+                coord.y--;
+
+                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else if (end.x < start.x && end.y > start.y) {
+            while (coord.x != end.x && coord.y != end.y) {
+                coord.x--;
+                coord.y++;
+
+                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+}
+
+bool Board::is_valid_move_rook(Piece *p, Piece::coordinate start, Piece::coordinate end) {
+    if (p->poss_move(start, end) && (start.x == end.x)) {
+        // trace row
+        Piece::coordinate coord = start;
+
+        if (end.y > start.y) {
+            while (coord.y != end.y) {
+                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                    return false;
+                }
+
+                coord.y++;
+            }
+
+            return true;
+        } else if (end.y < start.y) {
+            while (coord.y != end.y) {
+                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                    return false;
+                }
+
+                coord.y--;
+            }
+
+            return true;
+        }
+    } else if (p->poss_move(start, end) && (start.y == end.y)) {
+        // trace col
+        Piece::coordinate coord = start;
+
+        if (end.x > start.x) {
+            while (coord.x != end.x) {
+                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                    return false;
+                }
+
+                coord.x++;
+            }
+
+            return true;
+        } else if (end.x < start.x) {
+            while (coord.x != end.x) {
+                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                    return false;
+                }
+
+                coord.x--;
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate end) {
     /*
      * Make sure end position is on the board
@@ -121,6 +229,10 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
         return false;
     }
 
+    if (!verify_valid_coord(end) || (chess_board[end.x][end.y] != nullptr
+                                     && chess_board[end.x][end.y]->get_colour() == p->get_colour())) {
+        return false;
+    }
     Piece::PieceType type = p->get_type();
 
     if (type == Piece::PieceType::PAWN) {
@@ -130,11 +242,6 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
          * - Is the end coordinate a nullptr (empty square)?
          * -- If not, is it the same colour as the current piece? If so, return false --- can only be true if empty square or enemy piece
          */
-        if (!verify_valid_coord(end) || (chess_board[end.x][end.y] != nullptr
-            && chess_board[end.x][end.y]->get_colour() == p->get_colour())) {
-            return false;
-        }
-
         if (p->poss_move(start, end) && chess_board[end.x][end.y] == nullptr) {
             // white
             if (p->get_colour() == Piece::PieceColour::WHITE && end.y == start.y + 2) {
@@ -152,68 +259,15 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
             return chess_board[end.x][end.y] != nullptr;
         }
     } else if (type == Piece::PieceType::BISHOP) {
-        if (!verify_valid_coord(end) || (chess_board[end.x][end.y] != nullptr
-            && chess_board[end.x][end.y]->get_colour() == p->get_colour())) {
-            return false;
-        }
-        if (p->poss_move(start, end)) {
-            // trace the diagonal
-            Piece::coordinate coord = start;
-            if (end.x > start.x && end.y > start.y) {
-                while (coord.x != end.x && coord.y != end.y) {
-                    coord.x++;
-                    coord.y++;
-
-                    if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
-                        return false;
-                    }
-                }
-
-                return true;
-            } else if (end.x < start.x && end.y < start.y) {
-                while (coord.x != end.x && coord.y != end.y) {
-                    coord.x--;
-                    coord.y--;
-
-                    if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
-                        return false;
-                    }
-                }
-
-                return true;
-            } else if (end.x > start.x && end.y < start.y) {
-                while (coord.x != end.x && coord.y != end.y) {
-                    coord.x++;
-                    coord.y--;
-
-                    if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
-                        return false;
-                    }
-                }
-
-                return true;
-            } else if (end.x < start.x && end.y > start.y) {
-                while (coord.x != end.x && coord.y != end.y) {
-                    coord.x--;
-                    coord.y++;
-
-                    if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }
+        return is_valid_move_bishop(p, start, end);
     } else if (type == Piece::PieceType::KNIGHT) {
-        return (p->poss_move(start, end) &&
-                (chess_board[end.x][end.y] == nullptr || chess_board[end.x][end.y]->get_colour() != p->get_colour()));
+        return (p->poss_move(start, end));
     } else if (type == Piece::PieceType::KING) {
-
+        return (p->poss_move(start, end));
     } else if (type == Piece::PieceType::QUEEN) {
-
+        return is_valid_move_rook(p, start, end) || is_valid_move_bishop(p, start, end);
     } else if (type == Piece::PieceType::ROOK) {
-
+        return is_valid_move_rook(p, start, end);
     }
 
     return false;
