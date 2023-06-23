@@ -11,14 +11,17 @@ void board_std_setup(std::vector<std::vector<Piece*>> &brd);
 
 Board::Board() {
     board_std_setup(chess_board);
-    show();
 }
 std::string Board::print_board() {
 
 }
 
 void Board::show() {
+    std::cout << "     a  b  c  d  e  f  g  h" << std::endl;
+    int row_num = 0;
     for (auto i = 0; i < chess_board.size(); i++) {
+        row_num++;
+        std::cout << row_num << " | ";
         for (auto j = 0; j < chess_board[i].size(); j++) {
             std::cout << " ";
             if (chess_board[j][i] == nullptr) {
@@ -106,7 +109,7 @@ std::string Board::coord_pos_translation(Piece::coordinate coord) {
 }
 
 bool Board::verify_valid_pos(std::string pos) {
-    return (pos.size() == 2 && pos[0] >= 'a' && pos[1] >= 1 && pos[1] <= 8);
+    return (pos.size() == 2 && pos[0] >= 'a' && pos[0] <= 'h' && pos[1] >= '1' && pos[1] <= '8');
 }
 
 bool Board::verify_valid_coord(Piece::coordinate coord) {
@@ -165,6 +168,14 @@ bool Board::is_valid_move_bishop(Piece*p, Piece::coordinate start, Piece::coordi
     }
 }
 
+bool operator==(const Piece::coordinate& a, const Piece::coordinate& b) {
+    return (a.x == b.x) && (a.y == b.y);
+}
+
+bool operator!=(const Piece::coordinate& a, const Piece::coordinate& b) {
+    return (a.x != b.x) || (a.y != b.y);
+}
+
 bool Board::is_valid_move_rook(Piece *p, Piece::coordinate start, Piece::coordinate end) {
     if (p->poss_move(start, end) && (start.x == end.x)) {
         // trace row
@@ -172,7 +183,7 @@ bool Board::is_valid_move_rook(Piece *p, Piece::coordinate start, Piece::coordin
 
         if (end.y > start.y) {
             while (coord.y != end.y) {
-                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                if (coord != start && (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr)) {
                     return false;
                 }
 
@@ -182,7 +193,7 @@ bool Board::is_valid_move_rook(Piece *p, Piece::coordinate start, Piece::coordin
             return true;
         } else if (end.y < start.y) {
             while (coord.y != end.y) {
-                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                if (coord != start && (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr)) {
                     return false;
                 }
 
@@ -194,10 +205,10 @@ bool Board::is_valid_move_rook(Piece *p, Piece::coordinate start, Piece::coordin
     } else if (p->poss_move(start, end) && (start.y == end.y)) {
         // trace col
         Piece::coordinate coord = start;
-
         if (end.x > start.x) {
             while (coord.x != end.x) {
-                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                std::cout << "looking at (" << coord.x << ", " << coord.y << ")" << std::endl;
+                if (coord != start && (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr)) {
                     return false;
                 }
 
@@ -207,7 +218,7 @@ bool Board::is_valid_move_rook(Piece *p, Piece::coordinate start, Piece::coordin
             return true;
         } else if (end.x < start.x) {
             while (coord.x != end.x) {
-                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                if (coord != start && (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr)) {
                     return false;
                 }
 
@@ -275,7 +286,6 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
 
 Piece::coordinate Board::pos_coord_translation(std::string pos) {
     bool valid_pos = verify_valid_pos(pos);
-
     if (valid_pos) {
         std::unordered_map<int, char> col_conversion = {
                 {'a', 0},
@@ -288,6 +298,6 @@ Piece::coordinate Board::pos_coord_translation(std::string pos) {
                 {'h', 7},
         };
 
-        return {col_conversion[pos[0]], (int(pos[1]) - 1)};
+        return {col_conversion[pos[0]], (int(pos[1]-'0') - 1)};
     }
 }
