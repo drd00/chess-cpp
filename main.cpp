@@ -26,72 +26,78 @@ void start_game(Board* brd) {
 
     while (true) {
         if (player_current == player_w) {
-            brd->show();
-            bool valid_input = false;
-            std::string starting_pos;
-            std::string end_pos;
-            while (!valid_input) {
-                std::cout << "Move for white:" << std::endl << "starting pos: ";
-                std::cin >> starting_pos;
-                std::cout << "end pos: ";
-                std::cin >> end_pos;
+            bool valid = false;
+            while (!valid) {
+                brd->show();
+                bool valid_input = false;
+                std::string starting_pos;
+                std::string end_pos;
+                while (!valid_input) {
+                    std::cout << "Move for white:" << std::endl << "starting pos: ";
+                    std::cin >> starting_pos;
+                    std::cout << "end pos: ";
+                    std::cin >> end_pos;
 
-                valid_input = verify_input(starting_pos, end_pos);
+                    valid_input = verify_input(starting_pos, end_pos);
 
-                if (!valid_input) {
-                    std::cout << "Invalid input! Try again." << std::endl;
+                    if (!valid_input) {
+                        std::cout << "Invalid input! Try again." << std::endl;
+                    }
+                }
+                coord start = Board::pos_coord_translation(starting_pos);
+                coord end = Board::pos_coord_translation(end_pos);
+                Piece* selected_piece = brd->chess_board[start.x][start.y];
+
+                valid = selected_piece != nullptr &&
+                        selected_piece->get_colour() == player_current && brd->is_valid_move(selected_piece, start, end);
+                if (valid) {
+                    std::cout << "That is a valid move!" << std::endl;
+                    make_move(selected_piece, brd, start, end);
+                } else {
+                    std::cout << "That is not a valid move!" << std::endl;
                 }
             }
-            coord start = Board::pos_coord_translation(starting_pos);
-            coord end = Board::pos_coord_translation(end_pos);
-            Piece* selected_piece = brd->chess_board[start.x][start.y];
-
-            bool valid = selected_piece != nullptr &&
-                    selected_piece->get_colour() == player_current && brd->is_valid_move(selected_piece, start, end);
-            if (valid) {
-                std::cout << "That is a valid move!" << std::endl;
-                make_move(selected_piece, brd, start, end);
-            } else {
-                std::cout << "That is not a valid move!" << std::endl;
-            }
-
             player_current = player_b;
         } else if (player_current == player_b) {
-            brd->show();
-            bool valid_input = false;
-            std::string starting_pos;
-            std::string end_pos;
-            while (!valid_input) {
-                std::cout << "Move for black:" << std::endl << "starting pos: ";
-                std::cin >> starting_pos;
-                std::cout << "end pos: ";
-                std::cin >> end_pos;
+            bool valid = false;
+            while (!valid) {
+                brd->show();
+                bool valid_input = false;
+                std::string starting_pos;
+                std::string end_pos;
+                while (!valid_input) {
+                    std::cout << "Move for black:" << std::endl << "starting pos: ";
+                    std::cin >> starting_pos;
+                    std::cout << "end pos: ";
+                    std::cin >> end_pos;
 
-                valid_input = verify_input(starting_pos, end_pos);
+                    valid_input = verify_input(starting_pos, end_pos);
 
-                if (!valid_input) {
-                    std::cout << "Invalid input! Try again." << std::endl;
+                    if (!valid_input) {
+                        std::cout << "Invalid input! Try again." << std::endl;
+                    }
+                }
+                coord start = Board::pos_coord_translation(starting_pos);
+                coord end = Board::pos_coord_translation(end_pos);
+                Piece* selected_piece = brd->chess_board[start.x][start.y];
+
+                valid = selected_piece != nullptr &&
+                        selected_piece->get_colour() == player_current && brd->is_valid_move(selected_piece, start, end);
+                if (valid) {
+                    std::cout << "That is a valid move!" << std::endl;
+                    make_move(selected_piece, brd, start, end);
+                } else {
+                    std::cout << "That is not a valid move!" << std::endl;
                 }
             }
-            coord start = Board::pos_coord_translation(starting_pos);
-            coord end = Board::pos_coord_translation(end_pos);
-            Piece* selected_piece = brd->chess_board[start.x][start.y];
 
-            bool valid = selected_piece != nullptr &&
-                    selected_piece->get_colour() == player_current && brd->is_valid_move(selected_piece, start, end);
-            if (valid) {
-                std::cout << "That is a valid move!" << std::endl;
-                make_move(selected_piece, brd, start, end);
-            } else {
-                std::cout << "That is not a valid move!" << std::endl;
-            }
             player_current = player_w;
         }
     }
 }
 
 int main() {
-    Board* b = new Board();
+    auto* b = new Board();
     start_game(b);
 
     return 0;
