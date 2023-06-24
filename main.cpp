@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Board.h"
+#include "Chess_lib/Board.h"
 
 typedef Piece::PieceColour Player;
 typedef Piece::coordinate coord;
