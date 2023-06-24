@@ -9,6 +9,7 @@
 class Board {
 public:
     Board();
+    Board(int setting);    // for unit testing; does not set up pieces in default manner
     ~Board() = default;
     std::vector<std::vector<Piece*>> chess_board;
 

@@ -8,10 +8,30 @@
 #include <iostream>
 
 void board_std_setup(std::vector<std::vector<Piece*>> &brd);
+void board_test_setup(std::vector<std::vector<Piece*>> &brd);
 
 Board::Board() {
     board_std_setup(chess_board);
 }
+
+Board::Board(int setting) {
+    if (setting == 0) {
+        /*
+         * Init all to nullptr
+         */
+        int rows = 8;
+        int cols = 8;
+
+        for (auto i = 0; i < cols; i++) {
+            std::vector<Piece*> col;
+            for (auto j = 0; j < rows; j++) {
+                col.push_back(nullptr);
+            }
+            chess_board.push_back(col);
+        }
+    }
+}
+
 std::string Board::print_board() {
 
 }
