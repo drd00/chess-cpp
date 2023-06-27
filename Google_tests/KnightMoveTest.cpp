@@ -4,7 +4,6 @@
 #include "Board.h"
 #include "Knight.h"
 #include "Pawn.h"
-#include "Rook.h"
 
 /*
  * Knight movement
@@ -183,9 +182,40 @@ TEST(KnightMoveTest, KnightEdge) {
 }
 
 TEST(KnightMoveTest, KnightInvalidPatterns) {
+    auto* b = new Board(0);
+    auto* k = new Knight(Piece::PieceColour::WHITE);
+    /*
+     * A Knight cannot move in the same pattern as any other Piece type
+     */
 
-}
+    // pawn moves
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 4}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 5}));
 
-TEST(KnightMoveTest, KnightBoardBounds) {
+    // king moves
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {2, 2}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {2, 3}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {2, 4}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 2}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {4, 4}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {4, 3}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {4, 2}));
 
+    // rook moves
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 4}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 5}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 6}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 7}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 2}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 1}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 0}));
+
+    // bishop moves
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {2, 3}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {1, 3}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {0, 3}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {4, 3}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {5, 3}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {6, 3}));
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {7, 3}));
 }
