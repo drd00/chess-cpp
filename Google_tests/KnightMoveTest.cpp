@@ -193,6 +193,7 @@ TEST(KnightMoveTest, KnightInvalidPatterns) {
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 5}));
 
     // king moves
+    ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {3, 4}));
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {2, 2}));
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {2, 3}));
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {2, 4}));

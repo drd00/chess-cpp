@@ -162,3 +162,67 @@ TEST(PawnMoveTest, PawnCaptureTest) {
     delete pw;
     delete pb;
 }
+
+TEST(PawnMoveTest, PawnInvalidPatterns) {
+    auto* b = new Board(0);
+    auto* pw = new Pawn(Piece::PieceColour::WHITE);
+    auto* pb = new Pawn(Piece::PieceColour::BLACK);
+
+    // king moves
+    // white
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {2, 2}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {2, 3}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {2, 4}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {3, 2}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {4, 4}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {4, 3}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {4, 2}));
+    // black
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {2, 2}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {2, 3}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {2, 4}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {3, 4}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {4, 4}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {4, 3}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {4, 2}));
+
+    // rook moves
+    // white
+    ASSERT_TRUE(b->is_valid_move(pw, {3, 3}, {3, 4}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {3, 5}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {3, 6}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {3, 7}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {3, 2}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {3, 1}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {3, 0}));
+    // black
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {3, 4}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {3, 5}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {3, 6}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {3, 7}));
+    ASSERT_TRUE(b->is_valid_move(pb, {3, 3}, {3, 2}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {3, 1}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {3, 0}));
+
+    // bishop moves
+    // white
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {2, 3}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {1, 3}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {0, 3}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {4, 3}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {5, 3}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {6, 3}));
+    ASSERT_FALSE(b->is_valid_move(pw, {3, 3}, {7, 3}));
+    // black
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {2, 3}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {1, 3}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {0, 3}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {4, 3}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {5, 3}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {6, 3}));
+    ASSERT_FALSE(b->is_valid_move(pb, {3, 3}, {7, 3}));
+
+    delete b;
+    delete pw;
+    delete pb;
+}
