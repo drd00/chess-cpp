@@ -12,23 +12,38 @@ void board_test_setup(std::vector<std::vector<Piece*>> &brd);
 
 Board::Board() {
     board_std_setup(chess_board);
+    white_king_pos = {4, 0};
+    black_king_pos = {4, 7};
 }
 
 Board::Board(int setting) {
-    if (setting == 0) {
-        /*
-         * Init all to nullptr
-         */
-        int rows = 8;
-        int cols = 8;
+    /*
+    * Init all to nullptr
+    */
+    int rows = 8;
+    int cols = 8;
 
-        for (auto i = 0; i < cols; i++) {
-            std::vector<Piece*> col;
-            for (auto j = 0; j < rows; j++) {
-                col.push_back(nullptr);
-            }
-            chess_board.push_back(col);
+    for (auto i = 0; i < cols; i++) {
+        std::vector<Piece*> col;
+        for (auto j = 0; j < rows; j++) {
+            col.push_back(nullptr);
         }
+        chess_board.push_back(col);
+    }
+
+    if (setting == 1) {
+        /*
+         * Castling test setup
+         */
+        chess_board[0][0] = new Rook(Piece::PieceColour::WHITE);
+        chess_board[7][0] = new Rook(Piece::PieceColour::WHITE);
+        chess_board[4][0] = new King(Piece::PieceColour::WHITE);
+        white_king_pos = {4, 0};
+
+        chess_board[0][7] = new Rook(Piece::PieceColour::BLACK);
+        chess_board[7][7] = new Rook(Piece::PieceColour::BLACK);
+        chess_board[4][7] = new King(Piece::PieceColour::BLACK);
+        black_king_pos = {4, 7};
     }
 }
 
@@ -227,7 +242,6 @@ bool Board::is_valid_move_rook(Piece *p, Piece::coordinate start, Piece::coordin
         Piece::coordinate coord = start;
         if (end.x > start.x) {
             while (coord.x != end.x) {
-                std::cout << "looking at (" << coord.x << ", " << coord.y << ")" << std::endl;
                 if (coord != start && (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr)) {
                     return false;
                 }
@@ -294,7 +308,65 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
     } else if (type == Piece::PieceType::KNIGHT) {
         return (p->poss_move(start, end));
     } else if (type == Piece::PieceType::KING) {
-        return (p->poss_move(start, end));
+        King* k = (King*) p;
+        bool std_move = k->poss_move(start, end);
+        if (std_move) {
+            return true;
+        }
+
+        /*
+         * Consider whether a King can castle to the left or the right
+         * N.B. neither the King piece nor the Rook piece on that castling side can have moved
+         */
+        if (k->poss_castle_r(start, end)) {
+            bool clear_path_r;
+            bool is_rook_r;
+            Rook* r;
+
+            if (k->get_colour() == Piece::PieceColour::WHITE) {
+                clear_path_r = chess_board[5][0] == nullptr && chess_board[6][0] == nullptr;
+                is_rook_r = chess_board[7][0] != nullptr && chess_board[7][0]->get_type() == Piece::PieceType::ROOK;
+                if (is_rook_r) {
+                    r = (Rook*) chess_board[7][0];
+                }
+
+                return clear_path_r && is_rook_r && !r->has_moved;
+            } else if (k->get_colour() == Piece::PieceColour::BLACK) {
+                clear_path_r = chess_board[5][7] == nullptr && chess_board[6][0] == nullptr;
+                is_rook_r = chess_board[7][7] != nullptr && chess_board[7][7]->get_type() == Piece::PieceType::ROOK;
+                if (is_rook_r) {
+                    r = (Rook*) chess_board[7][7];
+                }
+
+                return clear_path_r && is_rook_r && !r->has_moved;
+            }
+        } else if (k->poss_castle_l(start, end)) {
+            bool clear_path_l;
+            bool is_rook_l;
+            Rook* r;
+
+            if (k->get_colour() == Piece::PieceColour::WHITE) {
+                clear_path_l = chess_board[3][0] == nullptr && chess_board[2][0] == nullptr
+                        && chess_board[1][0] == nullptr;
+                is_rook_l = chess_board[0][0] != nullptr && chess_board[0][0]->get_type() == Piece::PieceType::ROOK;
+                if (is_rook_l) {
+                    r = (Rook*) chess_board[0][0];
+                }
+
+                return clear_path_l && is_rook_l && !r->has_moved;
+            } else if (k->get_colour() == Piece::PieceColour::BLACK) {
+                clear_path_l = chess_board[3][7] == nullptr && chess_board[2][7] == nullptr
+                        && chess_board[1][7] == nullptr;
+                is_rook_l = chess_board[0][7] != nullptr && chess_board[0][7]->get_type() == Piece::PieceType::ROOK;
+                if (is_rook_l) {
+                    r = (Rook*) chess_board[0][7];
+                }
+
+                return clear_path_l && is_rook_l && !r->has_moved;
+            }
+        }
+
+        return false;
     } else if (type == Piece::PieceType::QUEEN) {
         return is_valid_move_rook(p, start, end) || is_valid_move_bishop(p, start, end);
     } else if (type == Piece::PieceType::ROOK) {

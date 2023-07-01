@@ -7,7 +7,10 @@ class Rook : public Piece {
 public:
     Rook(PieceColour colour) : Piece(colour, PieceType::ROOK) {
         this->id = 'R';
+        has_moved = false;
     }
+
+    bool has_moved;
 
     bool poss_move(coordinate start, coordinate end) override {
         bool moved = (start.x != end.x) || (start.y != end.y);

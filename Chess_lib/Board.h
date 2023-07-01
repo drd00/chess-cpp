@@ -26,6 +26,9 @@ public:
     bool is_valid_move_bishop(Piece* p, Piece::coordinate start, Piece::coordinate end);    // used in is_valid_move
     bool is_valid_move_rook(Piece* p, Piece::coordinate start, Piece::coordinate end);  // used in is_valid_move
 
+    Piece::coordinate white_king_pos;
+    Piece::coordinate black_king_pos;
+
     static std::string coord_pos_translation(Piece::coordinate coord);
     static Piece::coordinate pos_coord_translation(std::string pos);
     static bool verify_valid_pos(std::string pos);
