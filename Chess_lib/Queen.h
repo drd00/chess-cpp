@@ -31,6 +31,12 @@ public:
     bool poss_capture(coordinate start, coordinate end) override {
         return poss_move(start, end);
     }
+
+    Piece* clone() override {
+        auto* q = new Queen(*this);
+
+        return q;
+    }
 };
 
 #endif //CHESS_QUEEN_H

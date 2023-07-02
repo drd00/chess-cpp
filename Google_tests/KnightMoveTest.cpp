@@ -94,10 +94,10 @@ TEST(KnightMoveTest, KnightPattern1FriendlyPiece) {
     auto* b = new Board(0);
     auto* k = new Knight(Piece::PieceColour::WHITE);
 
-    b->chess_board[2][5] = k;
-    b->chess_board[4][5] = k;
-    b->chess_board[2][1] = k;
-    b->chess_board[4][1] = k;
+    b->chess_board[2][5] = new Knight(Piece::PieceColour::WHITE);
+    b->chess_board[4][5] = new Knight(Piece::PieceColour::WHITE);
+    b->chess_board[2][1] = new Knight(Piece::PieceColour::WHITE);
+    b->chess_board[4][1] = new Knight(Piece::PieceColour::WHITE);
 
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {2, 5}));
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {4, 5}));
@@ -105,17 +105,16 @@ TEST(KnightMoveTest, KnightPattern1FriendlyPiece) {
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {4, 1}));
 
     delete b;
-    delete k;
 }
 
 TEST(KnightMoveTest, KnightPattern2FriendlyPiece) {
     auto* b = new Board(0);
     auto* k = new Knight(Piece::PieceColour::WHITE);
 
-    b->chess_board[1][4] = k;
-    b->chess_board[5][4] = k;
-    b->chess_board[1][2] = k;
-    b->chess_board[5][2] = k;
+    b->chess_board[1][4] = new Knight(Piece::PieceColour::WHITE);
+    b->chess_board[5][4] = new Knight(Piece::PieceColour::WHITE);
+    b->chess_board[1][2] = new Knight(Piece::PieceColour::WHITE);
+    b->chess_board[5][2] = new Knight(Piece::PieceColour::WHITE);
 
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {1, 4}));
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {5, 4}));
@@ -123,18 +122,16 @@ TEST(KnightMoveTest, KnightPattern2FriendlyPiece) {
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {5, 2}));
 
     delete b;
-    delete k;
 }
 
 TEST(KnightMoveTest, KnightPattern1EnemyPiece) {
     auto* b = new Board(0);
     auto* k = new Knight(Piece::PieceColour::WHITE);
-    auto* enemy_piece = new Pawn(Piece::PieceColour::BLACK);
 
-    b->chess_board[2][5] = enemy_piece;
-    b->chess_board[4][5] = enemy_piece;
-    b->chess_board[2][1] = enemy_piece;
-    b->chess_board[4][1] = enemy_piece;
+    b->chess_board[2][5] = new Pawn(Piece::PieceColour::BLACK);
+    b->chess_board[4][5] = new Pawn(Piece::PieceColour::BLACK);
+    b->chess_board[2][1] = new Pawn(Piece::PieceColour::BLACK);
+    b->chess_board[4][1] = new Pawn(Piece::PieceColour::BLACK);
 
     ASSERT_TRUE(b->is_valid_move(k, {3, 3}, {2, 5}));
     ASSERT_TRUE(b->is_valid_move(k, {3, 3}, {4, 5}));
@@ -148,12 +145,11 @@ TEST(KnightMoveTest, KnightPattern1EnemyPiece) {
 TEST(KnightMoveTest, KnightPattern2EnemyPiece) {
     auto* b = new Board(0);
     auto* k = new Knight(Piece::PieceColour::WHITE);
-    auto* enemy_piece = new Pawn(Piece::PieceColour::BLACK);
 
-    b->chess_board[1][4] = enemy_piece;
-    b->chess_board[5][4] = enemy_piece;
-    b->chess_board[1][2] = enemy_piece;
-    b->chess_board[5][2] = enemy_piece;
+    b->chess_board[1][4] = new Pawn(Piece::PieceColour::BLACK);
+    b->chess_board[5][4] = new Pawn(Piece::PieceColour::BLACK);
+    b->chess_board[1][2] = new Pawn(Piece::PieceColour::BLACK);
+    b->chess_board[5][2] = new Pawn(Piece::PieceColour::BLACK);
 
     ASSERT_TRUE(b->is_valid_move(k, {3, 3}, {1, 4}));
     ASSERT_TRUE(b->is_valid_move(k, {3, 3}, {5, 4}));
@@ -219,4 +215,7 @@ TEST(KnightMoveTest, KnightInvalidPatterns) {
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {5, 3}));
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {6, 3}));
     ASSERT_FALSE(b->is_valid_move(k, {3, 3}, {7, 3}));
+
+    delete b;
+    delete k;
 }

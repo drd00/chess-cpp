@@ -23,6 +23,12 @@ public:
     bool poss_capture(coordinate start, coordinate end) override {
         return poss_capture(start, end);
     }
+
+    Piece* clone() override {
+        auto* b = new Bishop(*this);
+
+        return b;
+    }
 };
 
 #endif //CHESS_BISHOP_H

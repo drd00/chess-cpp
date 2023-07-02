@@ -10,10 +10,41 @@
 void board_std_setup(std::vector<std::vector<Piece*>> &brd);
 void board_test_setup(std::vector<std::vector<Piece*>> &brd);
 
+// TODO: reduce redundancy here
+
 Board::Board() {
     board_std_setup(chess_board);
     white_king_pos = {4, 0};
     black_king_pos = {4, 7};
+}
+
+Board::Board(Board* templ) {
+    /*
+     * Init all to nullptr
+     */
+    int rows = 8;
+    int cols = 8;
+
+    for (auto i = 0; i < cols; i++) {
+        std::vector<Piece*> col;
+        for (auto j = 0; j < rows; j++) {
+            col.push_back(nullptr);
+        }
+        chess_board.push_back(col);
+    }
+
+    for (auto i = 0; i < templ->chess_board.size(); i++) {
+        for (auto j = 0; j < templ->chess_board[i].size(); j++) {
+            if (templ->chess_board[i][j] != nullptr) {
+                chess_board[i][j] = templ->chess_board[i][j]->clone();
+            } else {
+                chess_board[i][j] = nullptr;
+            }
+        }
+    }
+
+    white_king_pos = templ->white_king_pos;
+    black_king_pos = templ->black_king_pos;
 }
 
 Board::Board(int setting) {
@@ -47,8 +78,38 @@ Board::Board(int setting) {
     }
 }
 
-std::string Board::print_board() {
 
+
+Board::~Board() {
+    /*
+     * Delete each of the associated Piece objects
+     */
+    for (auto i = 0; i < chess_board.size(); i++) {
+        for (auto j = 0; j < chess_board[i].size(); j++) {
+            delete chess_board[i][j];
+        }
+    }
+
+    chess_board.clear();
+}
+
+void Board::show_colour() {
+    std::cout << "     a  b  c  d  e  f  g  h" << std::endl;
+    int row_num = 0;
+    for (auto i = 0; i < chess_board.size(); i++) {
+        row_num++;
+        std::cout << row_num << " | ";
+        for (auto j = 0; j < chess_board[i].size(); j++) {
+            std::cout << " ";
+            if (chess_board[j][i] == nullptr) {
+                std::cout << "-";
+            } else {
+                std::cout << (chess_board[j][i]->get_colour() == Piece::PieceColour::WHITE ? 'W' : 'B') << chess_board[j][i]->get_id();
+            }
+            std::cout << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 void Board::show() {
@@ -201,6 +262,8 @@ bool Board::is_valid_move_bishop(Piece*p, Piece::coordinate start, Piece::coordi
             return true;
         }
     }
+
+    return false;
 }
 
 bool operator==(const Piece::coordinate& a, const Piece::coordinate& b) {
@@ -332,7 +395,7 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
 
                 return clear_path_r && is_rook_r && !r->has_moved;
             } else if (k->get_colour() == Piece::PieceColour::BLACK) {
-                clear_path_r = chess_board[5][7] == nullptr && chess_board[6][0] == nullptr;
+                clear_path_r = chess_board[5][7] == nullptr && chess_board[6][7] == nullptr;
                 is_rook_r = chess_board[7][7] != nullptr && chess_board[7][7]->get_type() == Piece::PieceType::ROOK;
                 if (is_rook_r) {
                     r = (Rook*) chess_board[7][7];
@@ -392,4 +455,6 @@ Piece::coordinate Board::pos_coord_translation(std::string pos) {
 
         return {col_conversion[pos[0]], (int(pos[1]-'0') - 1)};
     }
+
+    return {-1, -1};    // invalid input pos
 }

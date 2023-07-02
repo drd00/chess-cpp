@@ -21,6 +21,12 @@ public:
     bool poss_capture(coordinate start, coordinate end) override {
         return poss_move(start, end);
     }
+
+    Piece* clone() override {
+        auto* r = new Rook(*this);
+
+        return r;
+    }
 };
 
 #endif //CHESS_ROOK_H

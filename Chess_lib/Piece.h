@@ -30,6 +30,8 @@ public:
         this->type = type;
     }
 
+    virtual ~Piece() = default;
+
     PieceColour get_colour() {
         return colour;
     }
@@ -41,6 +43,9 @@ public:
     char get_id() {
         return id;
     }
+
+    virtual Piece* clone() = 0;
+
     /**
      * poss_move: a pure virtual function which takes x and y
      * coordinates and outputs whether that move is technically possible

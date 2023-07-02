@@ -41,6 +41,12 @@ public:
 
         return false;
     }
+
+    Piece* clone() override {
+        auto* p = new Pawn(*this);
+
+        return p;
+    }
 };
 
 #endif //CHESS_PAWN_H

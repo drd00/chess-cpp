@@ -25,6 +25,12 @@ public:
     bool poss_capture(coordinate start, coordinate end) override {
         return poss_move(start, end);
     }
+
+    Piece* clone() override {
+        auto* k = new Knight(*this);
+
+        return k;
+    }
 };
 
 #endif //CHESS_KNIGHT_H

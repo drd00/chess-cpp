@@ -10,7 +10,8 @@ class Board {
 public:
     Board();
     Board(int setting);    // for unit testing; does not set up pieces in default manner
-    ~Board() = default;
+    Board(Board* templ); // create a board with another board as a template
+    ~Board();
     std::vector<std::vector<Piece*>> chess_board;
 
     /**
@@ -34,9 +35,8 @@ public:
     static bool verify_valid_pos(std::string pos);
     static bool verify_valid_coord(Piece::coordinate coord);
 
-    std::string print_board();
-
     void show();
+    void show_colour();
 };
 
 

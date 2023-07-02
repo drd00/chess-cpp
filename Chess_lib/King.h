@@ -55,6 +55,12 @@ public:
 
         return false;
     }
+
+    Piece* clone() override {
+        auto* k = new King(*this);
+
+        return k;
+    }
 };
 
 #endif //CHESS_KING_H
