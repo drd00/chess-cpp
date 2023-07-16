@@ -12,14 +12,16 @@ public:
 
     bool has_moved;
 
-    bool poss_move(coordinate start, coordinate end) override {
+    bool poss_move(coordinate end) override {
+        coordinate start = coord;
+
         bool moved = (start.x != end.x) || (start.y != end.y);
 
         return moved && (start.x == end.x || start.y == end.y);
     }
 
-    bool poss_capture(coordinate start, coordinate end) override {
-        return poss_move(start, end);
+    bool poss_capture(coordinate end) override {
+        return poss_move(end);
     }
 
     Piece* clone() override {

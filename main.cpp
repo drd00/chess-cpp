@@ -15,9 +15,9 @@ int check_check(Board* brd) {
     for (auto i = 0; i < brd->chess_board.size(); i++) {
         for (auto j = 0; j < brd->chess_board[i].size(); j++) {
             if (brd->chess_board[i][j] != nullptr) {
-                if (brd->is_valid_move(brd->chess_board[i][j], {i, j}, brd->white_king_pos)) {
+                if (brd->is_valid_move(brd->chess_board[i][j], brd->white_king_pos)) {
                     return 0;
-                } else if (brd->is_valid_move(brd->chess_board[i][j], {i, j}, brd->black_king_pos)) {
+                } else if (brd->is_valid_move(brd->chess_board[i][j], brd->black_king_pos)) {
                     return 1;
                 }
             }
@@ -27,7 +27,9 @@ int check_check(Board* brd) {
     return -1;
 }
 
-void make_move(Board* brd, Piece* p, coord start, coord end) {
+void make_move(Board* brd, Piece* p, coord end) {
+    coord start = p->coord;
+
     // standard move
     if (brd->chess_board[end.x][end.y] == nullptr) {
         brd->chess_board[end.x][end.y] = p;
@@ -55,20 +57,22 @@ void make_move(Board* brd, Piece* p, coord start, coord end) {
             r->has_moved = true;
         }
     }
+
+    p->coord = end;
 }
 
-void move_rook_castle(Board* brd, Piece* selected_piece, coord start, coord end) {
+void move_rook_castle(Board* brd, Piece* selected_piece, coord end) {
     // move the rook in the case of castling
     if (selected_piece->get_type() == Piece::PieceType::KING) {
         King* k = (King*) selected_piece;
-        if (k->get_colour() == Piece::PieceColour::WHITE && k->poss_castle_l(start, end)) {
-            make_move(brd, brd->chess_board[0][0], {0, 0}, {3, 0});
-        } else if (k->get_colour() == Piece::PieceColour::WHITE && k->poss_castle_r(start, end)) {
-            make_move(brd, brd->chess_board[7][0], {7, 0}, {5, 0});
-        } else if (k->get_colour() == Piece::PieceColour::BLACK && k->poss_castle_l(start, end)) {
-            make_move(brd, brd->chess_board[0][7], {0, 7}, {3, 7});
-        } else if (k->get_colour() == Piece::PieceColour::BLACK && k->poss_castle_r(start, end)) {
-            make_move(brd, brd->chess_board[7][7], {7, 7}, {5, 7});
+        if (k->get_colour() == Piece::PieceColour::WHITE && k->poss_castle_l(end)) {
+            make_move(brd, brd->chess_board[0][0], {3, 0});
+        } else if (k->get_colour() == Piece::PieceColour::WHITE && k->poss_castle_r(end)) {
+            make_move(brd, brd->chess_board[7][0], {5, 0});
+        } else if (k->get_colour() == Piece::PieceColour::BLACK && k->poss_castle_l(end)) {
+            make_move(brd, brd->chess_board[0][7], {3, 7});
+        } else if (k->get_colour() == Piece::PieceColour::BLACK && k->poss_castle_r(end)) {
+            make_move(brd, brd->chess_board[7][7], {5, 7});
         }
     }
 }
@@ -83,8 +87,8 @@ bool handle_move(Board* brd, Piece* selected_piece, coord start, coord end) {
     auto* simulate = new Board(brd);
     auto* sel_piece = selected_piece->clone();
 
-    move_rook_castle(simulate, sel_piece, start, end);
-    make_move(simulate, sel_piece, start, end);
+    move_rook_castle(simulate, sel_piece, end);
+    make_move(simulate, sel_piece, end);
 
     bool white_check = (check_check(simulate) == 0);
     bool black_check = (check_check(simulate) == 1);
@@ -97,8 +101,8 @@ bool handle_move(Board* brd, Piece* selected_piece, coord start, coord end) {
         delete simulate;
     }
 
-    move_rook_castle(brd, selected_piece, start, end);
-    make_move(brd, selected_piece, start, end);
+    move_rook_castle(brd, selected_piece, end);
+    make_move(brd, selected_piece, end);
 
     int is_check = check_check(brd);
     if (is_check == 0) {
@@ -137,7 +141,7 @@ void game_turn(Player ply, Board* brd) {
         Piece* selected_piece = brd->chess_board[start.x][start.y];
 
         valid = selected_piece != nullptr &&
-                selected_piece->get_colour() == ply && brd->is_valid_move(selected_piece, start, end);
+                selected_piece->get_colour() == ply && brd->is_valid_move(selected_piece, end);
 
         if (valid) {
             // make the move if it does not put ply into a check position

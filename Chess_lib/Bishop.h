@@ -10,7 +10,8 @@ public:
         this->id = 'B';
     }
 
-    bool poss_move(coordinate start, coordinate end) override {
+    bool poss_move(coordinate end) override {
+        coordinate start = coord;
         bool moved = (start.x != end.x) || (start.y != end.y);
 
         // if change in x == change in y
@@ -20,8 +21,8 @@ public:
         return moved && (change_x == change_y);
     }
 
-    bool poss_capture(coordinate start, coordinate end) override {
-        return poss_capture(start, end);
+    bool poss_capture(coordinate end) override {
+        return poss_move(end);
     }
 
     Piece* clone() override {

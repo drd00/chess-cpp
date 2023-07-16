@@ -9,7 +9,9 @@ public:
         this->id = 'P';
     }
 
-    bool poss_move(coordinate start, coordinate end) override {
+    bool poss_move(coordinate end) override {
+        coordinate start = coord;
+
         // in starting position?
         int starting_row_white = 1;
         int starting_row_black = 6;
@@ -31,7 +33,9 @@ public:
         return false;
     }
 
-    bool poss_capture(coordinate start, coordinate end) override {
+    bool poss_capture(coordinate end) override {
+        coordinate start = coord;
+
         // TODO: account for en passant capture
         if (this->get_colour() == PieceColour::WHITE) {
             return (end.y == start.y + 1) && (end.x == start.x + 1 || end.x == start.x - 1);

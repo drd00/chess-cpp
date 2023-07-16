@@ -13,18 +13,22 @@ public:
 
     bool has_moved;
 
-    bool poss_move(coordinate start, coordinate end) override {
+    bool poss_move(coordinate end) override {
+        coordinate start = coord;
+
         bool moved = (start.x != end.x) || (start.y != end.y);
 
         return moved &&
             std::abs(start.x - end.x) <= 1 && std::abs(start.y - end.y) <= 1;
     }
 
-    bool poss_capture(coordinate start, coordinate end) override {
-        return poss_move(start, end);
+    bool poss_capture(coordinate end) override {
+        return poss_move(end);
     }
 
-    bool poss_castle_l(coordinate start, coordinate end) {
+    bool poss_castle_l(coordinate end) {
+        coordinate start = coord;
+
         if (this->get_colour() == Piece::PieceColour::WHITE) {
             bool valid_start = start.x == 4 && start.y == 0;
             bool valid_end = (end.x == 2 && end.y == 0);
@@ -40,7 +44,9 @@ public:
         return false;
     }
 
-    bool poss_castle_r(coordinate start, coordinate end) {
+    bool poss_castle_r(coordinate end) {
+        coordinate start = coord;
+
         if (this->get_colour() == Piece::PieceColour::WHITE) {
             bool valid_start = start.x == 4 && start.y == 0;
             bool valid_end = (end.x == 6 && end.y == 0);

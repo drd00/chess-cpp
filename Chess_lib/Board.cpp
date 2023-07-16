@@ -148,44 +148,63 @@ void board_std_setup(std::vector<std::vector<Piece*>> &brd) {
      */
     for (auto i = 0; i < cols; i++) {
         brd[i][1] = new Pawn(Piece::PieceColour::WHITE);
+        brd[i][1]->coord = {i, 1};
+
         brd[i][6] = new Pawn(Piece::PieceColour::BLACK);
+        brd[i][6]->coord = {i, 6};
     }
 
     /*
      * Bishop pieces
      */
     brd[2][0] = new Bishop(Piece::PieceColour::WHITE);
+    brd[2][0]->coord = {2 , 0};
     brd[2][7] = new Bishop(Piece::PieceColour::BLACK);
+    brd[2][7]->coord = {2, 7};
     brd[5][0] = new Bishop(Piece::PieceColour::WHITE);
+    brd[5][0]->coord = {5, 0};
     brd[5][7] = new Bishop(Piece::PieceColour::BLACK);
+    brd[5][7]->coord = {5, 7};
 
     /*
      * Knight pieces
      */
     brd[1][0] = new Knight(Piece::PieceColour::WHITE);
+    brd[1][0]->coord = {1, 0};
     brd[1][7] = new Knight(Piece::PieceColour::BLACK);
+    brd[1][7]->coord = {1, 7};
     brd[6][0] = new Knight(Piece::PieceColour::WHITE);
+    brd[6][0]->coord = {6, 0};
     brd[6][7] = new Knight(Piece::PieceColour::BLACK);
+    brd[6][7]->coord = {6, 7};
 
     /*
      * Rook pieces
      */
     brd[0][0] = new Rook(Piece::PieceColour::WHITE);
+    brd[0][0]->coord = {0, 0};
     brd[0][7] = new Rook(Piece::PieceColour::BLACK);
+    brd[0][7]->coord = {0, 7};
     brd[7][0] = new Rook(Piece::PieceColour::WHITE);
+    brd[7][0]->coord = {7, 0};
     brd[7][7] = new Rook(Piece::PieceColour::BLACK);
+    brd[7][7]->coord = {7, 7};
 
     /*
      * King pieces
      */
     brd[4][0] = new King(Piece::PieceColour::WHITE);
+    brd[4][0]->coord = {4, 0};
     brd[4][7] = new King(Piece::PieceColour::BLACK);
+    brd[4][7]->coord = {4, 7};
 
     /*
      * Queen pieces
      */
     brd[3][0] = new Queen(Piece::PieceColour::WHITE);
+    brd[3][0]->coord = {3, 0};
     brd[3][7] = new Queen(Queen::PieceColour::BLACK);
+    brd[3][7]->coord = {3, 7};
 }
 
 std::string Board::coord_pos_translation(Piece::coordinate coord) {
@@ -212,10 +231,11 @@ bool Board::verify_valid_coord(Piece::coordinate coord) {
     return coord.x >= 0 && coord.x <= 7 && coord.y >= 0 && coord.y <= 7;
 }
 
-bool Board::is_valid_move_bishop(Piece*p, Piece::coordinate start, Piece::coordinate end) {
-    if (p->poss_move(start, end)) {
+bool Board::is_valid_move_bishop(Piece* p, Piece::coordinate end) {
+    if (p->poss_move(end)) {
         // trace the diagonal
-        Piece::coordinate coord = start;
+        Piece::coordinate coord = p->coord;
+        Piece::coordinate start = p->coord;
         if (end.x > start.x && end.y > start.y) {
             while (coord.x != end.x && coord.y != end.y) {
                 coord.x++;
@@ -274,11 +294,11 @@ bool operator!=(const Piece::coordinate& a, const Piece::coordinate& b) {
     return (a.x != b.x) || (a.y != b.y);
 }
 
-bool Board::is_valid_move_rook(Piece *p, Piece::coordinate start, Piece::coordinate end) {
-    if (p->poss_move(start, end) && (start.x == end.x)) {
+bool Board::is_valid_move_rook(Piece *p, Piece::coordinate end) {
+    Piece::coordinate coord = p->coord;
+    Piece::coordinate start = p->coord;
+    if (p->poss_move(end) && (start.x == end.x)) {
         // trace row
-        Piece::coordinate coord = start;
-
         if (end.y > start.y) {
             while (coord.y != end.y) {
                 if (coord != start && (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr)) {
@@ -300,9 +320,8 @@ bool Board::is_valid_move_rook(Piece *p, Piece::coordinate start, Piece::coordin
 
             return true;
         }
-    } else if (p->poss_move(start, end) && (start.y == end.y)) {
+    } else if (p->poss_move(end) && (start.y == end.y)) {
         // trace col
-        Piece::coordinate coord = start;
         if (end.x > start.x) {
             while (coord.x != end.x) {
                 if (coord != start && (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr)) {
@@ -329,7 +348,9 @@ bool Board::is_valid_move_rook(Piece *p, Piece::coordinate start, Piece::coordin
     return false;
 }
 
-bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate end) {
+bool Board::is_valid_move(Piece* p, Piece::coordinate end) {
+    Piece::coordinate start = p->coord;
+
     /*
      * Make sure end position is on the board
      */
@@ -350,7 +371,7 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
          * - Is the end coordinate a nullptr (empty square)?
          * -- If not, is it the same colour as the current piece? If so, return false --- can only be true if empty square or enemy piece
          */
-        if (p->poss_move(start, end) && chess_board[end.x][end.y] == nullptr) {
+        if (p->poss_move(end) && chess_board[end.x][end.y] == nullptr) {
             // white
             if (p->get_colour() == Piece::PieceColour::WHITE && end.y == start.y + 2) {
                 return chess_board[start.x][start.y + 1] == nullptr;
@@ -362,17 +383,17 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
             }
 
             return true;
-        } else if (p->poss_capture(start, end)) {
+        } else if (p->poss_capture(end)) {
             // know from previous check that it is not the same colour
             return chess_board[end.x][end.y] != nullptr;
         }
     } else if (type == Piece::PieceType::BISHOP) {
-        return is_valid_move_bishop(p, start, end);
+        return is_valid_move_bishop(p, end);
     } else if (type == Piece::PieceType::KNIGHT) {
-        return (p->poss_move(start, end));
+        return (p->poss_move(end));
     } else if (type == Piece::PieceType::KING) {
         King* k = (King*) p;
-        bool std_move = k->poss_move(start, end);
+        bool std_move = k->poss_move(end);
         if (std_move) {
             return true;
         }
@@ -381,7 +402,7 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
          * Consider whether a King can castle to the left or the right
          * N.B. neither the King piece nor the Rook piece on that castling side can have moved
          */
-        if (k->poss_castle_r(start, end)) {
+        if (k->poss_castle_r(end)) {
             bool clear_path_r;
             bool is_rook_r;
             Rook* r;
@@ -403,7 +424,7 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
 
                 return clear_path_r && is_rook_r && !r->has_moved;
             }
-        } else if (k->poss_castle_l(start, end)) {
+        } else if (k->poss_castle_l(end)) {
             bool clear_path_l;
             bool is_rook_l;
             Rook* r;
@@ -431,9 +452,9 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate e
 
         return false;
     } else if (type == Piece::PieceType::QUEEN) {
-        return is_valid_move_rook(p, start, end) || is_valid_move_bishop(p, start, end);
+        return is_valid_move_rook(p, end) || is_valid_move_bishop(p, end);
     } else if (type == Piece::PieceType::ROOK) {
-        return is_valid_move_rook(p, start, end);
+        return is_valid_move_rook(p, end);
     }
 
     return false;

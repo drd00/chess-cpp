@@ -25,6 +25,8 @@ public:
         BLACK,
     };
 
+    coordinate coord;
+
     Piece(PieceColour colour, PieceType type) {
         this->colour = colour;
         this->type = type;
@@ -51,12 +53,11 @@ public:
      * coordinates and outputs whether that move is technically possible
      * under any circumstances for this piece type
      * Does not account for board boundaries, other pieces, etc. - hence quite basic
-     * @param start: the starting coordinates
      * @param end: the desired coordinate to move to
      * @return bool whether that change in coordinates is technically possible for
      * this piece type
      */
-     virtual bool poss_move(coordinate start, coordinate end) = 0;
+     virtual bool poss_move(coordinate end) = 0;
 
      /**
       * poss_capture: a pure virtual function which takes x and y
@@ -64,12 +65,11 @@ public:
       * under any circumstances
       * Does not account for board boundaries, other pieces, etc.
       * Should be the same as can_move_geo for all piece types except Pawn
-      * @param start: the starting coordinates
       * @param end: the desired coordinate to capture
       * @return bool whether than change in coordinates (capturing) is technically
       * possible for this piece type
       */
-      virtual bool poss_capture(coordinate start, coordinate end) = 0;
+      virtual bool poss_capture(coordinate end) = 0;
 
 
 private:

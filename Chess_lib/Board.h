@@ -23,9 +23,9 @@ public:
      * @param end: the goal coordinates on the board of p
      * @return bool whether a move for Piece p is valid, taking into account the board state
      */
-    bool is_valid_move(Piece* p, Piece::coordinate start, Piece::coordinate end);
-    bool is_valid_move_bishop(Piece* p, Piece::coordinate start, Piece::coordinate end);    // used in is_valid_move
-    bool is_valid_move_rook(Piece* p, Piece::coordinate start, Piece::coordinate end);  // used in is_valid_move
+    bool is_valid_move(Piece* p, Piece::coordinate end);
+    bool is_valid_move_bishop(Piece* p, Piece::coordinate end);    // used in is_valid_move
+    bool is_valid_move_rook(Piece* p, Piece::coordinate end);  // used in is_valid_move
 
     Piece::coordinate white_king_pos;
     Piece::coordinate black_king_pos;
