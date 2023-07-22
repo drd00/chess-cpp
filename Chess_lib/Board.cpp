@@ -10,8 +10,6 @@
 void board_std_setup(std::vector<std::vector<Piece*>> &brd);
 void board_test_setup(std::vector<std::vector<Piece*>> &brd);
 
-// TODO: reduce redundancy here
-
 Board::Board() {
     board_std_setup(chess_board);
     white_king_pos = {4, 0};
@@ -75,6 +73,22 @@ Board::Board(int setting) {
         chess_board[7][7] = new Rook(Piece::PieceColour::BLACK);
         chess_board[4][7] = new King(Piece::PieceColour::BLACK);
         black_king_pos = {4, 7};
+    } else if (setting == 2) {
+        /*
+         * Queens setup
+         */
+        chess_board[3][3] = new Queen(Piece::PieceColour::WHITE);
+        chess_board[3][3]->coord = { 3, 3 };
+        chess_board[5][5] = new Pawn(Piece::PieceColour::BLACK);
+        chess_board[5][5]->coord = { 5, 5 };
+        chess_board[3][5] = new Pawn(Piece::PieceColour::BLACK);
+        chess_board[3][5]->coord = { 3, 5 };
+        chess_board[0][1] = new King(Piece::PieceColour::WHITE);
+        chess_board[0][1]->coord = { 0, 1 };
+        white_king_pos = { 0, 1 };
+        chess_board[6][7] = new King(Piece::PieceColour::BLACK);
+        chess_board[6][7]->coord = { 6, 7 };
+        black_king_pos = { 6, 7 };
     }
 }
 
@@ -241,7 +255,7 @@ bool Board::is_valid_move_bishop(Piece* p, Piece::coordinate end) {
                 coord.x++;
                 coord.y++;
 
-                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                if (!verify_valid_coord(coord) || (chess_board[coord.x][coord.y] != nullptr && (coord.x != end.x && coord.y != end.y))) {
                     return false;
                 }
             }
@@ -252,7 +266,7 @@ bool Board::is_valid_move_bishop(Piece* p, Piece::coordinate end) {
                 coord.x--;
                 coord.y--;
 
-                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                if (!verify_valid_coord(coord) || (chess_board[coord.x][coord.y] != nullptr && (coord.x != end.x && coord.y != end.y))) {
                     return false;
                 }
             }
@@ -263,7 +277,7 @@ bool Board::is_valid_move_bishop(Piece* p, Piece::coordinate end) {
                 coord.x++;
                 coord.y--;
 
-                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                if (!verify_valid_coord(coord) || (chess_board[coord.x][coord.y] != nullptr && (coord.x != end.x && coord.y != end.y))) {
                     return false;
                 }
             }
@@ -274,7 +288,7 @@ bool Board::is_valid_move_bishop(Piece* p, Piece::coordinate end) {
                 coord.x--;
                 coord.y++;
 
-                if (!verify_valid_coord(coord) || chess_board[coord.x][coord.y] != nullptr) {
+                if (!verify_valid_coord(coord) || (chess_board[coord.x][coord.y] != nullptr && (coord.x != end.x && coord.y != end.y))) {
                     return false;
                 }
             }
@@ -393,7 +407,7 @@ bool Board::is_valid_move(Piece* p, Piece::coordinate end) {
         return (p->poss_move(end));
     } else if (type == Piece::PieceType::KING) {
         King* k = (King*) p;
-        bool std_move = k->poss_move(end);
+        bool std_move = k->poss_move(end) && (chess_board[end.x][end.y] == nullptr || chess_board[end.x][end.y]->get_colour() != k->get_colour());
         if (std_move) {
             return true;
         }

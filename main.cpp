@@ -77,21 +77,18 @@ void move_rook_castle(Board* brd, Piece* selected_piece, coord end) {
     }
 }
 
-bool handle_move(Board* brd, Piece* selected_piece, coord start, coord end) {
-    /*
-     * Return true and make a move if this move does not result in another check position
-     *
-     * Return false otherwise: the attempted move results in check
-     */
-    Piece::PieceColour colour = selected_piece->get_colour();
+bool run_simulate(Board* brd, Piece* p, coord end) {
+    Piece::PieceColour colour = p->get_colour();
     auto* simulate = new Board(brd);
-    auto* sel_piece = selected_piece->clone();
+    auto* sel_piece = p->clone();
 
     move_rook_castle(simulate, sel_piece, end);
     make_move(simulate, sel_piece, end);
 
-    bool white_check = (check_check(simulate) == 0);
-    bool black_check = (check_check(simulate) == 1);
+    int check = check_check(simulate);
+
+    bool white_check = (check == 0);
+    bool black_check = (check == 1);
 
     if ((white_check && colour == Piece::PieceColour::WHITE) || (black_check && colour == Piece::PieceColour::BLACK)) {
         delete simulate;
@@ -101,20 +98,96 @@ bool handle_move(Board* brd, Piece* selected_piece, coord start, coord end) {
         delete simulate;
     }
 
-    move_rook_castle(brd, selected_piece, end);
-    make_move(brd, selected_piece, end);
-
-    int is_check = check_check(brd);
-    if (is_check == 0) {
-        std::cout << "White is now in check" << std::endl;
-    } else if (is_check == 1) {
-        std::cout << "Black is now in check" << std::endl;
-    }
-
     return true;
 }
 
-void game_turn(Player ply, Board* brd) {
+
+/*
+ * TODO: write this function with less repetition
+ */
+int check_mate(Board* brd, int check_status) {
+    /*
+     * Mate if the King is currently in check and any movement would result in the King
+     * still being in check
+     *
+     * Return 0 if white king checkmate
+     * Return 1 if black king checkmate
+     */
+
+    if (check_status == 0) {    // white king is in check
+        // check for mate
+        coord wk = brd->white_king_pos;
+        std::vector<coord> poss_end_coords { {wk.x + 1, wk.y + 1}, {wk.x + 1, wk.y}, {wk.x + 1, wk.y - 1},
+                                             {wk.x, wk.y - 1}, {wk.x - 1, wk.y - 1}, {wk.x - 1, wk.y}, {wk.x - 1, wk.y + 1},
+                                             {wk.x, wk.y + 1}};
+
+        bool any_poss_move = false;
+        Piece* white_king = brd->chess_board[wk.x][wk.y];
+        for (auto c : poss_end_coords) {
+            if (brd->is_valid_move(white_king, c)) {
+                any_poss_move = run_simulate(brd, white_king, c);
+
+                if (any_poss_move) {
+                    return -1;
+                }
+            }
+        }
+
+        return 0;
+    }
+    if (check_status == 1) {    // black king is in check
+        // check for mate
+        coord bk = brd->black_king_pos;
+
+        std::vector<coord> poss_end_coords { {bk.x + 1, bk.y + 1}, {bk.x + 1, bk.y}, {bk.x + 1, bk.y - 1},
+                                             {bk.x, bk.y - 1}, {bk.x - 1, bk.y - 1}, {bk.x - 1, bk.y}, {bk.x - 1, bk.y + 1},
+                                             {bk.x, bk.y + 1}};
+
+        bool any_poss_move = false;
+        Piece* black_king = brd->chess_board[bk.x][bk.y];
+        for (auto c : poss_end_coords) {
+            if(brd->is_valid_move(black_king, c)) {
+                any_poss_move = run_simulate(brd, black_king, c);
+
+                if (any_poss_move) {
+                    return -1;
+                }
+            }
+        }
+
+        return 1;
+    }
+
+    return -1;  // no mate
+}
+
+bool handle_move(Board* brd, Piece* selected_piece, coord end, bool &checkmate) {
+    /*
+     * Return true and make a move if this move does not result in another check position
+     *
+     * Return false otherwise: the attempted move results in check
+     */
+    bool sim_success = run_simulate(brd, selected_piece, end);
+    if (sim_success) {
+        move_rook_castle(brd, selected_piece, end);
+        make_move(brd, selected_piece, end);
+
+        int is_check = check_check(brd);
+        if (is_check == 0) {
+            std::cout << "White is now in check" << std::endl;
+        } else if (is_check == 1) {
+            std::cout << "Black is now in check" << std::endl;
+        }
+
+        checkmate = check_mate(brd, is_check) != -1;
+
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void game_turn(Player ply, Board* brd, bool &checkmate) {
     bool valid = false;
     while (!valid) {
         brd->show();
@@ -145,7 +218,12 @@ void game_turn(Player ply, Board* brd) {
 
         if (valid) {
             // make the move if it does not put ply into a check position
-            bool move = handle_move(brd, selected_piece, start, end);
+            bool move = handle_move(brd, selected_piece, end, checkmate);
+
+            if (checkmate) {
+                Player other_player = (ply == Player::WHITE ? Player::BLACK : Player::WHITE);
+                std::cout << "Checkmate! " << (other_player == Player::WHITE ? "Black" : "White") << " has won." << std::endl;
+            }
 
             if (!move) {
                 std::cout << "Invalid move! Attempt to move into check position" << std::endl;
@@ -162,22 +240,23 @@ void game_play(Board* brd) {
     Player player_b = Player::BLACK;
     Player player_current = player_w;
 
-    bool playing = true;
-    while (playing) {
+    bool mate = false;
+    while (!mate) {
         if (player_current == player_w) {
-            game_turn(player_w, brd);
+            game_turn(player_w, brd, mate);
             player_current = player_b;
         } else if (player_current == player_b) {
-            game_turn(player_b, brd);
+            game_turn(player_b, brd, mate);
             player_current = player_w;
         }
     }
 }
 
 int main() {
-    auto* b = new Board();
-    //auto* b = new Board(1);
+    //auto* b = new Board();
+    auto* b = new Board(2);
     game_play(b);
+
 
     return 0;
 }
