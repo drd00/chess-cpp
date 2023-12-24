@@ -4,10 +4,9 @@ This C++ project implements a chess game in the command-line.
 ## Build
 The program can be compiled using CMake.
 1. `git clone https://github.com/drd00/chess-cpp.git && cd chess-cpp`
-2. `git clone https://github.com/google/googletest.git`
-3. `mv googletest/ lib && mv lib/ Google_tests/`
-4. `cmake CMakeLists.txt`
-5. `make`
+2. `git clone https://github.com/google/googletest.git Google_tests/lib`
+3. `cmake CMakeLists.txt`
+4. `make`
 
 This is automated in the `build.sh` script; simply `./build.sh`.
 
